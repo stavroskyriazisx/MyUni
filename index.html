@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MyUni – Elective Recommender (Mockup)</title>
+<style>
+:root{
+  --accent:#1d3fa8;
+  --accent-dark:#14307f;
+  --accent-soft:#e8edfb;
+  --ink:#161d2e;
+  --muted:#566079;
+  --line:#d9deea;
+  --bg:#eef1f7;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:var(--ink);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+h1,h2,p{margin:0}
+
+.stage{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.phone{
+  position:relative;width:390px;height:min(844px,calc(100vh - 32px));min-height:560px;
+  background:#fff;border-radius:36px;border:1px solid var(--line);
+  box-shadow:0 24px 60px rgba(22,29,46,.18);overflow:hidden;
+}
+.screen{display:none;flex-direction:column;height:100%}
+.screen.active{display:flex}
+
+/* top bar */
+.top{padding:16px 20px 6px}
+.bar{display:flex;align-items:center;justify-content:space-between;min-height:44px}
+.back{
+  display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px 0 8px;margin-left:-8px;
+  background:none;border:0;border-radius:22px;color:var(--accent);font-weight:600;font-size:16px;
+}
+.back:hover{background:var(--accent-soft)}
+.step{font-size:14px;font-weight:600;color:var(--muted)}
+.progress{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+.progress i{height:6px;border-radius:3px;background:var(--accent-soft)}
+.progress i.on{background:var(--accent)}
+
+/* content */
+.content{flex:1;overflow-y:auto;padding:10px 20px 20px}
+.content h1{font-size:26px;line-height:1.2;font-weight:800;letter-spacing:-.01em;outline:none}
+.help{margin-top:8px;font-size:15px;line-height:1.45;color:var(--muted)}
+.label{margin:22px 0 10px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.footer{padding:12px 20px 22px;border-top:1px solid var(--line);background:#fff;display:flex;flex-direction:column;gap:8px}
+.primary,.secondary{
+  width:100%;min-height:54px;border-radius:16px;font-size:17px;font-weight:700;border:2px solid var(--accent);
+}
+.primary{background:var(--accent);color:#fff}
+.primary:hover{background:var(--accent-dark);border-color:var(--accent-dark)}
+.secondary{background:#fff;color:var(--accent)}
+.secondary:hover{background:var(--accent-soft)}
+
+/* welcome */
+.welcome{justify-content:space-between}
+.welcome .content{display:flex;flex-direction:column;justify-content:center;padding:28px 26px 10px}
+.logo{
+  width:64px;height:64px;border-radius:18px;background:var(--accent);color:#fff;display:flex;align-items:center;
+  justify-content:center;font-size:34px;font-weight:800;margin-bottom:18px;
+}
+.brand{font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.welcome h1{margin-top:6px;font-size:32px}
+.points{list-style:none;margin:26px 0 0;padding:0;display:flex;flex-direction:column;gap:14px}
+.points li{display:flex;gap:14px;align-items:flex-start;font-size:16px;line-height:1.4}
+.points b{
+  flex:none;width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+}
+.fine{margin-top:22px;font-size:13px;line-height:1.45;color:var(--muted)}
+
+/* grades */
+.row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.sub{font-size:17px;font-weight:600}
+.stepper{display:flex;align-items:center;gap:8px}
+.sbtn{
+  width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);background:#fff;font-size:22px;font-weight:600;
+  color:var(--accent);line-height:1;
+}
+.sbtn:hover{background:var(--accent-soft)}
+.stepper input{
+  width:64px;height:44px;text-align:center;font-size:20px;font-weight:700;border:1.5px solid var(--line);border-radius:12px;
+  -moz-appearance:textfield;appearance:textfield;
+}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.out{font-size:13px;color:var(--muted);margin-top:10px}
+
+/* chips and slider */
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{
+  min-height:44px;padding:0 18px;border-radius:22px;border:1.5px solid var(--line);background:#fff;font-size:16px;font-weight:600;
+}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.years .chip{min-width:64px;min-height:60px;border-radius:18px;font-size:22px;font-weight:800}
+.picked{margin-top:18px;padding:14px 16px;border-radius:16px;background:var(--accent-soft);font-size:16px}
+.slider{width:100%;height:44px;accent-color:var(--accent);margin:0}
+.scale{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.wl{margin-top:6px;font-size:16px;font-weight:700;color:var(--accent)}
+.live{
+  margin-top:24px;padding:14px 16px;border-radius:16px;background:var(--accent-soft);display:flex;flex-direction:column;gap:2px;
+}
+.live .k{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.04em;text-transform:uppercase}
+.live strong{font-size:18px}
+.live span.s{font-size:14px;color:var(--muted)}
+
+/* results */
+.sum{margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;color:var(--muted);line-height:1.4}
+.linkbtn{
+  flex:none;min-height:44px;padding:0 10px;background:none;border:0;color:var(--accent);font-weight:700;font-size:15px;text-decoration:underline;
+}
+.legend{margin-top:4px;padding:10px 14px;border-radius:12px;background:var(--accent-soft);font-size:14px;line-height:1.4}
+.card{
+  display:block;width:100%;text-align:left;margin-top:12px;padding:14px;background:#fff;border:1.5px solid var(--line);
+  border-radius:18px;
+}
+.card:hover{border-color:var(--accent)}
+.c-top{display:flex;align-items:center;gap:12px}
+.rank{
+  flex:none;width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:15px;
+  display:flex;align-items:center;justify-content:center;
+}
+.c-name{flex:1;font-size:18px;font-weight:700;display:flex;flex-direction:column;gap:2px}
+.best{font-style:normal;font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.04em;text-transform:uppercase}
+.c-score{display:flex;align-items:baseline;gap:2px}
+.c-score b{font-size:26px;font-weight:800;color:var(--accent)}
+.c-score small{font-size:13px;color:var(--muted)}
+.c-mid{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:12px;font-size:15px}
+.pill{
+  display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:0 10px;border-radius:14px;font-size:13px;font-weight:700;
+  border:1.5px solid var(--accent);white-space:nowrap;
+}
+.pill.high{background:var(--accent);color:#fff}
+.pill.medium{background:var(--accent-soft);color:var(--accent)}
+.pill.low{background:#fff;color:var(--muted);border-color:var(--line)}
+.meter{display:block;height:8px;border-radius:4px;background:var(--accent-soft);margin-top:12px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--accent);border-radius:4px;transition:width .3s}
+.c-go{display:flex;align-items:center;justify-content:flex-end;gap:2px;margin-top:8px;font-size:14px;font-weight:700;color:var(--accent)}
+.note{margin-top:18px;font-size:13px;line-height:1.45;color:var(--muted);text-align:center}
+
+/* detail */
+.hero{
+  margin-top:16px;padding:18px;border-radius:20px;background:var(--accent-soft);display:flex;flex-direction:column;gap:8px;align-items:flex-start;
+}
+.hero .k{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.04em;text-transform:uppercase}
+.hero .big{font-size:40px;font-weight:800;letter-spacing:-.02em;color:var(--accent-dark)}
+.hero .k2{font-size:15px;color:var(--ink)}
+.why{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:w}
+.why li{
+  counter-increment:w;position:relative;padding:14px 14px 14px 52px;border:1.5px solid var(--line);border-radius:16px;font-size:15px;line-height:1.45;
+}
+.why li::before{
+  content:counter(w);position:absolute;left:14px;top:14px;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;
+  font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;
+}
+.fitline{margin-top:12px;font-size:14px;line-height:1.45;color:var(--muted)}
+.part{margin-top:12px}
+.part .pl{display:flex;justify-content:space-between;font-size:15px}
+.part small{color:var(--muted);font-size:13px}
+.part .meter{margin-top:6px}
+
+@media (max-width:520px){
+  body{background:#fff}
+  .stage{padding:0;align-items:stretch}
+  .phone{width:100%;height:100vh;height:100dvh;min-height:0;border-radius:0;border:0;box-shadow:none}
+}
+</style>
+</head>
+<body>
+<main class="stage">
+<div class="phone">
+
+  <!-- 1. Welcome -->
+  <section class="screen welcome active" id="s1" aria-labelledby="h1">
+    <div class="content">
+      <div class="logo" aria-hidden="true">M</div>
+      <p class="brand">MyUni</p>
+      <h1 id="h1" tabindex="-1">Choose your electives with data, not guesswork.</h1>
+      <p class="help">MyUni looks at your past exam results and what you enjoy, predicts how well you would do in each elective, and ranks them for you.</p>
+      <ul class="points">
+        <li><b>1</b><span>Tell us your year, your interests and how much work you want</span></li>
+        <li><b>2</b><span>Enter your past exam results</span></li>
+        <li><b>3</b><span>See a predicted grade and a ranked list of electives</span></li>
+      </ul>
+      <p class="fine">Takes about a minute. Example data is already filled in, so you can just tap through. This is a demo: all predictions are examples.</p>
+    </div>
+    <div class="footer">
+      <button class="primary" data-action="go" data-to="2">Get started</button>
+    </div>
+  </section>
+
+  <!-- 2. Your year -->
+  <section class="screen" id="s2" aria-labelledby="h2">
+    <header class="top">
+      <div class="bar">
+        <button class="back" data-action="go" data-to="1">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Back
+        </button>
+        <span class="step">Step 1 of 4</span>
+      </div>
+      <div class="progress" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
+    </header>
+    <div class="content">
+      <h1 id="h2" tabindex="-1">Which year are you in?</h1>
+      <p class="help">Your year tells us how much study history we can use for your predictions. Tap the year you are in now.</p>
+      <h2 class="label">Year of study</h2>
+      <div class="chips years" id="years" role="group" aria-label="Year of study"></div>
+      <p class="picked" id="picked" aria-live="polite"></p>
+    </div>
+    <div class="footer">
+      <button class="primary" data-action="go" data-to="3">Continue</button>
+    </div>
+  </section>
+
+  <!-- 3. Your interests -->
+  <section class="screen" id="s3" aria-labelledby="h3">
+    <header class="top">
+      <div class="bar">
+        <button class="back" data-action="go" data-to="2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Back
+        </button>
+        <span class="step">Step 2 of 4</span>
+      </div>
+      <div class="progress" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+    </header>
+    <div class="content">
+      <h1 id="h3" tabindex="-1">What are you into?</h1>
+      <p class="help">Choose the topics that interest you and how much work you want per elective. This helps us rank electives you are likely to enjoy and can handle. Your recommendations change as you choose.</p>
+      <h2 class="label">Topics (tap to select)</h2>
+      <div class="chips" id="chips"></div>
+      <h2 class="label">Weekly workload per elective</h2>
+      <input class="slider" id="slider" type="range" min="1" max="5" step="1" value="3" aria-label="Weekly workload per elective, from light to heavy">
+      <div class="scale" aria-hidden="true"><span>Light</span><span>Medium</span><span>Heavy</span></div>
+      <p class="wl" id="wl" aria-live="polite"></p>
+      <div class="live" id="top" aria-live="polite"></div>
+    </div>
+    <div class="footer">
+      <button class="primary" data-action="go" data-to="4">Continue</button>
+    </div>
+  </section>
+
+  <!-- 4. Your results -->
+  <section class="screen" id="s4" aria-labelledby="h4">
+    <header class="top">
+      <div class="bar">
+        <button class="back" data-action="go" data-to="3">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Back
+        </button>
+        <span class="step">Step 3 of 4</span>
+      </div>
+      <div class="progress" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+    </header>
+    <div class="content">
+      <h1 id="h4" tabindex="-1">Your past exam results</h1>
+      <p class="help">Enter your past results. We use them to predict how you would do in each elective. Example grades are already filled in. Tap − or + to change one.</p>
+      <div id="grades" style="margin-top:14px"></div>
+      <p class="out">All grades are out of 10.</p>
+    </div>
+    <div class="footer">
+      <button class="primary" data-action="go" data-to="5">See my recommendations</button>
+    </div>
+  </section>
+
+  <!-- 5. Recommendations -->
+  <section class="screen" id="s5" aria-labelledby="h5">
+    <header class="top">
+      <div class="bar">
+        <button class="back" data-action="go" data-to="4">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Back
+        </button>
+        <span class="step">Step 4 of 4</span>
+      </div>
+      <div class="progress" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    </header>
+    <div class="content">
+      <h1 id="h5" tabindex="-1">Your recommended electives</h1>
+      <p class="help">Ranked by how well each elective fits your predicted grade, your interests and your workload. Tap a card to see why.</p>
+      <div class="sum"><span id="summary"></span><button class="linkbtn" data-action="go" data-to="3">Edit</button></div>
+      <p class="legend">Confidence shows how much past data supports the prediction.</p>
+      <div id="list"></div>
+      <p class="note">Predictions are estimates, not guarantees.</p>
+    </div>
+    <div class="footer">
+      <button class="secondary" data-action="reset">Start over</button>
+    </div>
+  </section>
+
+  <!-- 6. Subject detail -->
+  <section class="screen" id="s6" aria-label="Subject detail">
+    <header class="top">
+      <div class="bar">
+        <button class="back" data-action="go" data-to="5">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Back
+        </button>
+      </div>
+    </header>
+    <div class="content" id="detail"></div>
+    <div class="footer">
+      <button class="primary" data-action="go" data-to="5">Back to results</button>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<script>
+(function () {
+  var DEFAULTS = { Statistics: 8, Microeconomics: 7, Marketing: 9, Accounting: 6, English: 9 };
+  var SUBJECTS = Object.keys(DEFAULTS);
+  var YEARS = ['1', '2', '3', '4', '4+'];
+  var CHIPS = ['Marketing', 'Data', 'Law', 'Finance', 'Creative', 'People', 'Technology'];
+  var WORKLOAD = {
+    1: { label: 'Very light', hours: 2 },
+    2: { label: 'Light', hours: 4 },
+    3: { label: 'Medium', hours: 6 },
+    4: { label: 'Heavy', hours: 8 },
+    5: { label: 'Very heavy', hours: 10 }
+  };
+  var CONF_DOTS = { High: '●●●', Medium: '●●○', Low: '●○○' };
+  var LAST_SCREEN = 6;
+
+  function tone(g) { return g >= 8 ? 'a strong' : g >= 7 ? 'a solid' : 'a weaker'; }
+  function yearLabel(y) { return y === '4+' ? 'Year 4 or above' : 'Year ' + y; }
+
+  var ELECTIVES = [
+    {
+      id: 'cb', name: 'Consumer Behavior', blurb: 'How people choose, buy and stay loyal to products.',
+      chips: ['Marketing', 'People', 'Creative'], diff: 3, diffLabel: 'medium', hours: 6,
+      lo: 8.0, hi: 9.0, conf: 'High', rel: ['Marketing', 'English', 'Microeconomics'],
+      reasons: function (g) { return [
+        'Your Marketing grade of ' + g.Marketing + ' is ' + tone(g.Marketing) + ' signal for this subject.',
+        'Your English grade of ' + g.English + ' is ' + tone(g.English) + ' signal for the reading and writing it involves.',
+        'Your Microeconomics grade of ' + g.Microeconomics + ' is ' + tone(g.Microeconomics) + ' signal for understanding how consumers make choices.'
+      ]; }
+    },
+    {
+      id: 'dm', name: 'Digital Marketing', blurb: 'Running campaigns across search, social media and email.',
+      chips: ['Marketing', 'Creative', 'Technology'], diff: 3, diffLabel: 'medium', hours: 6,
+      lo: 7.5, hi: 8.5, conf: 'High', rel: ['Marketing', 'Statistics', 'English'],
+      reasons: function (g) { return [
+        'Your Marketing grade of ' + g.Marketing + ' is ' + tone(g.Marketing) + ' signal for this subject.',
+        'Your Statistics grade of ' + g.Statistics + ' is ' + tone(g.Statistics) + ' signal for the campaign analytics it uses.',
+        'Your English grade of ' + g.English + ' is ' + tone(g.English) + ' signal for writing campaign copy.'
+      ]; }
+    },
+    {
+      id: 'da', name: 'Data Analytics', blurb: 'Finding patterns in business data with statistics and software.',
+      chips: ['Data', 'Technology', 'Finance'], diff: 4, diffLabel: 'hard', hours: 9,
+      lo: 7.0, hi: 8.0, conf: 'Medium', rel: ['Statistics', 'Microeconomics', 'Accounting'],
+      reasons: function (g) { return [
+        'Your Statistics grade of ' + g.Statistics + ' is ' + tone(g.Statistics) + ' signal for the statistics at its core.',
+        'Your Microeconomics grade of ' + g.Microeconomics + ' is ' + tone(g.Microeconomics) + ' signal for the quantitative modeling it builds on.',
+        'Your Accounting grade of ' + g.Accounting + ' is ' + tone(g.Accounting) + ' signal for working comfortably with numbers.'
+      ]; }
+    },
+    {
+      id: 'bl', name: 'Business Law', blurb: 'Contracts, company rules and consumer rights.',
+      chips: ['Law', 'People'], diff: 3, diffLabel: 'medium', hours: 6,
+      lo: 6.0, hi: 7.5, conf: 'Medium', rel: ['English', 'Accounting', 'Microeconomics'],
+      reasons: function (g) { return [
+        'Your English grade of ' + g.English + ' is ' + tone(g.English) + ' signal for the heavy reading it involves.',
+        'Your Accounting grade of ' + g.Accounting + ' is ' + tone(g.Accounting) + ' signal for the attention to detail it needs.',
+        'Your Microeconomics grade of ' + g.Microeconomics + ' is ' + tone(g.Microeconomics) + ' signal for understanding how rules shape markets.'
+      ]; }
+    },
+    {
+      id: 'en', name: 'Entrepreneurship', blurb: 'Turning an idea into a business plan and a pitch.',
+      chips: ['Creative', 'Finance', 'People'], diff: 4, diffLabel: 'hard', hours: 9,
+      lo: 6.5, hi: 8.0, conf: 'Low', rel: ['Microeconomics', 'Marketing', 'Accounting'],
+      reasons: function (g) { return [
+        'Your Microeconomics grade of ' + g.Microeconomics + ' is ' + tone(g.Microeconomics) + ' signal for understanding markets and pricing.',
+        'Your Marketing grade of ' + g.Marketing + ' is ' + tone(g.Marketing) + ' signal for pitching and positioning an idea.',
+        'Your Accounting grade of ' + g.Accounting + ' is ' + tone(g.Accounting) + ' signal for budgeting and financial planning.'
+      ]; }
+    }
+  ];
+
+  var grades = {};
+  var selected = new Set();
+  var workload = 3;
+  var year = '2';
+  var openId = null;
+
+  function resetState() {
+    grades = {};
+    SUBJECTS.forEach(function (s) { grades[s] = DEFAULTS[s]; });
+    selected = new Set(['Marketing', 'Creative']);
+    workload = 3;
+    year = '2';
+    openId = null;
+  }
+
+  function clamp(n, a, b) { return Math.min(b, Math.max(a, n)); }
+  function f1(n) { return n.toFixed(1); }
+
+  /* Fake "model": hard-coded base ranges, nudged slightly by the grades entered. */
+  function compute() {
+    var out = ELECTIVES.map(function (e, order) {
+      var devs = e.rel.map(function (s) { return grades[s] - DEFAULTS[s]; });
+      var avg = devs.reduce(function (a, b) { return a + b; }, 0) / devs.length;
+      var shift = 0.3 * avg;
+      var lo = clamp(e.lo + shift, 0, 10);
+      var hi = clamp(e.hi + shift, 0, 10);
+      var mid = (lo + hi) / 2;
+      var matched = e.chips.filter(function (c) { return selected.has(c); });
+      var overlap = matched.length / e.chips.length;
+      var fit = clamp(1 - Math.abs(workload - e.diff) / 4, 0, 1);
+      var gradeP = mid / 10;
+      var score = Math.round(100 * (0.5 * gradeP + 0.3 * overlap + 0.2 * fit));
+      return {
+        e: e, id: e.id, name: e.name, order: order, lo: lo, hi: hi, mid: mid, conf: e.conf,
+        matched: matched, overlap: overlap, fit: fit, gradeP: gradeP, score: score,
+        range: f1(lo) + '–' + f1(hi)
+      };
+    });
+    out.sort(function (a, b) { return b.score - a.score || a.order - b.order; });
+    return out;
+  }
+
+  function confPill(c) {
+    return '<span class="pill ' + c.toLowerCase() + '"><span aria-hidden="true">' + CONF_DOTS[c] + '</span>' + c + ' confidence</span>';
+  }
+
+  /* ---------- builders ---------- */
+  function buildYears() {
+    document.getElementById('years').innerHTML = YEARS.map(function (y) {
+      return '<button class="chip" data-action="year" data-year="' + y + '" aria-label="' + yearLabel(y) + '" aria-pressed="' + (year === y) + '">' + y + '</button>';
+    }).join('');
+    document.getElementById('picked').textContent = 'You selected: ' + yearLabel(year);
+  }
+
+  function buildGrades() {
+    document.getElementById('grades').innerHTML = SUBJECTS.map(function (s) {
+      return '<div class="row">' +
+        '<label class="sub" for="g-' + s + '">' + s + '</label>' +
+        '<div class="stepper">' +
+        '<button class="sbtn" data-action="dec" data-s="' + s + '" aria-label="Decrease ' + s + ' grade">−</button>' +
+        '<input id="g-' + s + '" data-s="' + s + '" type="number" inputmode="decimal" min="0" max="10" step="0.5" value="' + grades[s] + '">' +
+        '<button class="sbtn" data-action="inc" data-s="' + s + '" aria-label="Increase ' + s + ' grade">+</button>' +
+        '</div></div>';
+    }).join('');
+  }
+
+  function buildChips() {
+    document.getElementById('chips').innerHTML = CHIPS.map(function (c) {
+      return '<button class="chip" data-action="chip" data-chip="' + c + '" aria-pressed="' + selected.has(c) + '">' + c + '</button>';
+    }).join('');
+  }
+
+  function renderWorkload() {
+    var w = WORKLOAD[workload];
+    document.getElementById('slider').value = workload;
+    document.getElementById('wl').textContent = w.label + ' · about ' + w.hours + ' hours a week per elective';
+  }
+
+  function renderTop() {
+    var r = compute()[0];
+    document.getElementById('top').innerHTML =
+      '<span class="k">Your top match right now</span>' +
+      '<strong>' + r.name + '</strong>' +
+      '<span class="s">Match score ' + r.score + '/100 · Predicted grade ' + r.range + '</span>';
+  }
+
+  function renderResults() {
+    var res = compute();
+    var topics = Array.from(selected);
+    document.getElementById('summary').textContent =
+      yearLabel(year) + ' · ' + (topics.length ? topics.join(', ') : 'no topics selected') + ' · Workload: ' + WORKLOAD[workload].label;
+    document.getElementById('list').innerHTML = res.map(function (r, i) {
+      return '<button class="card" data-action="open" data-id="' + r.id + '">' +
+        '<span class="c-top"><span class="rank">' + (i + 1) + '</span>' +
+        '<span class="c-name">' + r.name + (i === 0 ? '<em class="best">Best match</em>' : '') + '</span>' +
+        '<span class="c-score"><b>' + r.score + '</b><small>/100</small></span></span>' +
+        '<span class="c-mid"><span>Predicted grade: <b>' + r.range + '</b></span>' + confPill(r.conf) + '</span>' +
+        '<span class="meter" aria-hidden="true"><i style="width:' + r.score + '%"></i></span>' +
+        '<span class="c-go">See why <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span>' +
+        '</button>';
+    }).join('');
+  }
+
+  function bar(label, weight, value) {
+    var pct = Math.round(value * 100);
+    return '<div class="part"><div class="pl"><span>' + label + ' <small>(' + weight + '% of score)</small></span><b>' + pct + '%</b></div>' +
+      '<span class="meter" aria-hidden="true"><i style="width:' + pct + '%"></i></span></div>';
+  }
+
+  function renderDetail() {
+    var res = compute();
+    var rank = 0;
+    var r = null;
+    res.forEach(function (x, i) { if (x.id === openId) { r = x; rank = i + 1; } });
+    if (!r) { r = res[0]; rank = 1; }
+    var reasons = r.e.reasons(grades);
+    var fitText = r.matched.length
+      ? 'Interests matched: ' + r.matched.join(', ') + '. '
+      : 'None of your selected topics match this subject. ';
+    fitText += 'This elective has a ' + r.e.diffLabel + ' workload, and you chose ' + WORKLOAD[workload].label.toLowerCase() + '.';
+    document.getElementById('detail').innerHTML =
+      '<h1 id="h6" tabindex="-1">' + r.name + '</h1>' +
+      '<p class="help">' + r.e.blurb + ' Typical workload: about ' + r.e.hours + ' hours a week.</p>' +
+      '<div class="hero"><span class="k">Predicted grade (0–10 scale)</span>' +
+      '<span class="big">' + r.range + '</span>' + confPill(r.conf) +
+      '<span class="k2">Match score <b>' + r.score + '/100</b> · Rank ' + rank + ' of 5 · ' + yearLabel(year) + '</span></div>' +
+      '<h2 class="label">Why we recommended it</h2>' +
+      '<ol class="why">' + reasons.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ol>' +
+      '<p class="fitline">' + fitText + '</p>' +
+      '<h2 class="label">How the match score is built</h2>' +
+      bar('Predicted grade', 50, r.gradeP) +
+      bar('Interest match', 30, r.overlap) +
+      bar('Workload fit', 20, r.fit) +
+      '<p class="note">Predictions are estimates, not guarantees.</p>';
+  }
+
+  /* ---------- navigation ---------- */
+  function go(n) {
+    for (var i = 1; i <= LAST_SCREEN; i++) {
+      document.getElementById('s' + i).classList.toggle('active', i === n);
+    }
+    if (n === 3) { renderWorkload(); renderTop(); }
+    if (n === 5) { renderResults(); }
+    if (n === 6) { renderDetail(); }
+    var scroller = document.querySelector('#s' + n + ' .content');
+    if (scroller) { scroller.scrollTop = 0; }
+    var h = document.getElementById('h' + n);
+    if (h) { h.focus({ preventScroll: true }); }
+  }
+
+  function setGrade(s, v) {
+    v = clamp(Math.round(v * 2) / 2, 0, 10);
+    grades[s] = v;
+    var input = document.getElementById('g-' + s);
+    if (input) { input.value = v; }
+  }
+
+  /* ---------- events ---------- */
+  document.addEventListener('click', function (ev) {
+    var t = ev.target.closest('[data-action]');
+    if (!t) { return; }
+    var a = t.getAttribute('data-action');
+    if (a === 'go') { go(parseInt(t.getAttribute('data-to'), 10)); }
+    else if (a === 'inc') { var s1 = t.getAttribute('data-s'); setGrade(s1, grades[s1] + 0.5); }
+    else if (a === 'dec') { var s2 = t.getAttribute('data-s'); setGrade(s2, grades[s2] - 0.5); }
+    else if (a === 'year') { year = t.getAttribute('data-year'); buildYears(); }
+    else if (a === 'chip') {
+      var c = t.getAttribute('data-chip');
+      if (selected.has(c)) { selected.delete(c); } else { selected.add(c); }
+      t.setAttribute('aria-pressed', selected.has(c));
+      renderTop();
+    }
+    else if (a === 'open') { openId = t.getAttribute('data-id'); go(6); }
+    else if (a === 'reset') { resetState(); buildYears(); buildGrades(); buildChips(); renderWorkload(); go(1); }
+  });
+
+  document.addEventListener('change', function (ev) {
+    var el = ev.target;
+    if (el.matches && el.matches('input[data-s]')) {
+      var s = el.getAttribute('data-s');
+      var v = parseFloat(el.value);
+      if (isNaN(v)) { v = grades[s]; }
+      setGrade(s, v);
+    }
+  });
+
+  document.getElementById('slider').addEventListener('input', function (ev) {
+    workload = parseInt(ev.target.value, 10);
+    renderWorkload();
+    renderTop();
+  });
+
+  /* ---------- init ---------- */
+  resetState();
+  buildYears();
+  buildGrades();
+  buildChips();
+  renderWorkload();
+  renderTop();
+})();
+</script>
+</body>
+</html>
